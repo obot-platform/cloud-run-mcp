@@ -75,8 +75,8 @@ async function getServer() {
     return {};
   });
 
-  // Get GCP metadata info once
-  const gcpInfo = await checkGCP();
+  // Get GCP metadata info once (unless environment variables are set)
+  const gcpInfo = envRegion ? null : await checkGCP();
 
   // Determine the effective project and region based on priority: Env Var > GCP Metadata > Hardcoded default
   const effectiveProjectId =
