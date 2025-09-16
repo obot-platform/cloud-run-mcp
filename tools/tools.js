@@ -36,7 +36,7 @@ export const registerTools = (
   registerListServicesTool(server, options);
   registerGetServiceTool(server, options);
   registerGetServiceLogTool(server, options);
-  registerDeployLocalFolderTool(server, options);
+  // registerDeployLocalFolderTool(server, options);
   registerDeployFileContentsTool(server, options);
   registerDeployContainerImageTool(server, options);
 };
