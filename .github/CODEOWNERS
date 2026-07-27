@@ -1,0 +1,5 @@
+
+# Dependabot dependency ownership
+/example-sources-to-deploy/go.mod @obot-platform/obot-backend
+/package-lock.json @obot-platform/obot-backend
+/package.json @obot-platform/obot-backend
