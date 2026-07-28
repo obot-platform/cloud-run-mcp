@@ -48,7 +48,7 @@ export const registerPrompts = (server) => {
             role: 'user',
             content: {
               type: 'text',
-              text: `Use the deploy_local_folder tool to deploy the current folder${projectPrompt}${regionPrompt}. The service name should be ${serviceNamePrompt}`,
+              text: `Read the files in the current folder and use the deploy_file_contents tool to deploy them${projectPrompt}${regionPrompt}. The service name should be ${serviceNamePrompt}`,
             },
           },
         ],

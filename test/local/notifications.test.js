@@ -21,7 +21,7 @@ describe('Tool Notifications', () => {
     registerTools(server, { gcpCredentialsAvailable: true });
 
     const handler = server.registerTool.mock.calls.find(
-      (call) => call.arguments[0] === 'deploy_local_folder'
+      (call) => call.arguments[0] === 'deploy_file_contents'
     ).arguments[2];
 
     const sendNotification = mock.fn();
@@ -31,7 +31,7 @@ describe('Tool Notifications', () => {
         project: 'my-project',
         region: 'my-region',
         service: 'my-service',
-        folderPath: '/my/folder',
+        files: [{ filename: 'file1', content: 'content1' }],
       },
       { sendNotification }
     );
@@ -41,7 +41,7 @@ describe('Tool Notifications', () => {
       method: 'notifications/message',
       params: {
         level: 'info',
-        data: 'Starting deployment of local folder for service my-service in project my-project...',
+        data: 'Starting deployment of file contents for service my-service in project my-project...',
       },
     });
   });

@@ -11,12 +11,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20.20.2
       - run: npm ci
       # Now configure with the publish service for install.
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20.20.2
           registry-url: https://wombat-dressing-room.appspot.com/
       - run: npm publish
         env:
