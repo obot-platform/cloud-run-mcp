@@ -51,7 +51,7 @@ describe('registerPrompts', () => {
             role: 'user',
             content: {
               type: 'text',
-              text: `Use the deploy_local_folder tool to deploy the current folder. The service name should be my-service`,
+              text: `Read the files in the current folder and use the deploy_file_contents tool to deploy them. The service name should be my-service`,
             },
           },
         ],
@@ -73,7 +73,7 @@ describe('registerPrompts', () => {
             role: 'user',
             content: {
               type: 'text',
-              text: `Use the deploy_local_folder tool to deploy the current folder. The service name should be ${serviceName}`,
+              text: `Read the files in the current folder and use the deploy_file_contents tool to deploy them. The service name should be ${serviceName}`,
             },
           },
         ],
@@ -97,7 +97,7 @@ describe('registerPrompts', () => {
             role: 'user',
             content: {
               type: 'text',
-              text: `Use the deploy_local_folder tool to deploy the current folder in project my-project in region my-region. The service name should be my-service`,
+              text: `Read the files in the current folder and use the deploy_file_contents tool to deploy them in project my-project in region my-region. The service name should be my-service`,
             },
           },
         ],
