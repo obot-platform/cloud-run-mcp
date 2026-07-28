@@ -12,7 +12,7 @@ describe('registerTools', () => {
 
     registerTools(server);
 
-    assert.strictEqual(server.registerTool.mock.callCount(), 8);
+    assert.strictEqual(server.registerTool.mock.callCount(), 7);
     const toolNames = server.registerTool.mock.calls.map(
       (call) => call.arguments[0]
     );
@@ -22,7 +22,6 @@ describe('registerTools', () => {
         'create_project',
         'deploy_container_image',
         'deploy_file_contents',
-        'deploy_local_folder',
         'get_service',
         'get_service_log',
         'list_projects',
@@ -274,48 +273,6 @@ describe('registerTools', () => {
     });
   });
 
-  describe('deploy_local_folder', () => {
-    it('should deploy local folder', async () => {
-      const server = {
-        registerTool: mock.fn(),
-      };
-
-      const { registerTools } = await esmock(
-        '../../tools/tools.js',
-        {},
-        {
-          '../../lib/deployment/deployer.js': {
-            deploy: () => Promise.resolve({ uri: 'my-uri' }),
-          },
-        }
-      );
-
-      registerTools(server, { gcpCredentialsAvailable: true });
-
-      const handler = server.registerTool.mock.calls.find(
-        (call) => call.arguments[0] === 'deploy_local_folder'
-      ).arguments[2];
-      const result = await handler(
-        {
-          project: 'my-project',
-          region: 'my-region',
-          service: 'my-service',
-          folderPath: '/my/folder',
-        },
-        { sendNotification: mock.fn() }
-      );
-
-      assert.deepStrictEqual(result, {
-        content: [
-          {
-            type: 'text',
-            text: 'Cloud Run service my-service deployed from folder /my/folder in project my-project\nCloud Console: https://console.cloud.google.com/run/detail/my-region/my-service?project=my-project\nService URL: my-uri',
-          },
-        ],
-      });
-    });
-  });
-
   describe('deploy_file_contents', () => {
     it('should deploy file contents', async () => {
       const server = {
@@ -352,6 +309,86 @@ describe('registerTools', () => {
           {
             type: 'text',
             text: 'Cloud Run service my-service deployed in project my-project\nCloud Console: https://console.cloud.google.com/run/detail/my-region/my-service?project=my-project\nService URL: my-uri',
+          },
+        ],
+      });
+    });
+
+    it('should reject invalid deployment inputs', async () => {
+      const server = {
+        registerTool: mock.fn(),
+      };
+
+      const { registerTools } = await esmock('../../tools/tools.js', {});
+
+      registerTools(server, { gcpCredentialsAvailable: true });
+
+      const handler = server.registerTool.mock.calls.find(
+        (call) => call.arguments[0] === 'deploy_file_contents'
+      ).arguments[2];
+      const extra = { sendNotification: mock.fn() };
+
+      await assert.rejects(
+        () =>
+          handler(
+            { files: [{ filename: 'file1', content: 'content1' }] },
+            extra
+          ),
+        /Project must specified/
+      );
+      await assert.rejects(
+        () => handler({ project: 'my-project', files: 'not-an-array' }, extra),
+        /Files must be specified/
+      );
+      await assert.rejects(
+        () => handler({ project: 'my-project', files: [] }, extra),
+        /No files specified for deployment/
+      );
+      await assert.rejects(
+        () =>
+          handler(
+            { project: 'my-project', files: [{ filename: 'file1' }] },
+            extra
+          ),
+        /File file1 must have content/
+      );
+    });
+
+    it('should return a deployment error', async () => {
+      const server = {
+        registerTool: mock.fn(),
+      };
+
+      const { registerTools } = await esmock(
+        '../../tools/tools.js',
+        {},
+        {
+          '../../lib/deployment/deployer.js': {
+            deploy: () => Promise.reject(new Error('Deployment failed')),
+          },
+        }
+      );
+
+      registerTools(server, { gcpCredentialsAvailable: true });
+
+      const handler = server.registerTool.mock.calls.find(
+        (call) => call.arguments[0] === 'deploy_file_contents'
+      ).arguments[2];
+      const result = await handler(
+        {
+          project: 'my-project',
+          region: 'my-region',
+          service: 'my-service',
+          files: [{ filename: 'file1', content: 'content1' }],
+        },
+        { sendNotification: mock.fn() }
+      );
+
+      assert.deepStrictEqual(result, {
+        content: [
+          {
+            type: 'text',
+            text: 'Error deploying to Cloud Run: Deployment failed',
           },
         ],
       });
